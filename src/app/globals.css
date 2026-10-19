@@ -1,15 +1,17 @@
+/* -- Google Fonts (Inter + JetBrains Mono) -- */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ===================================================================
    DESIGN SYSTEM — Premium AI/ML Portfolio
    =================================================================== */
 
-/* -- Google Fonts (Inter + JetBrains Mono) -- */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
-
 /* -- Custom Properties / Design Tokens -- */
 :root {
-  /* Colors — Primary Palette */
+  /* Colors — Primary Palette (Light Mode) */
   --midnight-ink: #101828;
   --deep-navy: #172554;
   --electric-cobalt: #4563EB;
@@ -49,7 +51,7 @@
   /* Layout */
   --max-width: 1200px;
   --content-width: 960px;
-  --nav-height: 72px;
+  --nav-height: 80px;
 
   /* Borders */
   --radius-sm: 6px;
@@ -66,13 +68,37 @@
   --duration-slow: 400ms;
 }
 
+/* -- Dark Mode Theme Variables -- */
+.dark,
+[data-theme="dark"] {
+  --midnight-ink: #F1F5F9;
+  --deep-navy: #E2E8F0;
+  --electric-cobalt: #60A5FA;
+  --refined-teal: #2DD4BF;
+  --ice-blue: #1E293B;
+  --cool-white: #0B0F17;
+  --slate-gray: #94A3B8;
+  --border-gray: rgba(255, 255, 255, 0.12);
+  --white: #111827;
+
+  /* Extended palette for dark theme */
+  --cobalt-hover: #3B82F6;
+  --cobalt-subtle: rgba(96, 165, 250, 0.14);
+  --teal-subtle: rgba(45, 212, 191, 0.14);
+  --navy-overlay: rgba(255, 255, 255, 0.06);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 12px 32px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
 /* -- Base Reset & Styles -- */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 html {
@@ -88,6 +114,8 @@ body {
   background-color: var(--cool-white);
   line-height: 1.6;
   overflow-x: hidden;
+  transition: background-color var(--duration-normal) var(--ease-out),
+              color var(--duration-normal) var(--ease-out);
 }
 
 ::selection {
@@ -408,4 +436,36 @@ body {
   );
   margin: 0;
   border: none;
+}
+
+/* -- Dark Mode Component Overrides -- */
+.dark .btn-secondary {
+  color: var(--midnight-ink);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.dark .btn-secondary:hover {
+  background: rgba(96, 165, 250, 0.15);
+  border-color: var(--electric-cobalt);
+  color: #FFFFFF;
+}
+
+.dark .glass-card {
+  background: #111827;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass-card:hover {
+  border-color: rgba(96, 165, 250, 0.35);
+}
+
+.dark .section-divider {
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.12) 20%,
+    rgba(255, 255, 255, 0.12) 80%,
+    transparent
+  );
 }

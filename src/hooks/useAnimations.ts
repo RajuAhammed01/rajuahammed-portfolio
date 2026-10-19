@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useSyncExternalStore } from "react";
 
 // Hook: Intersection Observer for scroll-based animations
 export function useInView(
@@ -46,16 +46,18 @@ export function useSmoothScroll() {
 
 // Hook: Active section detection
 export function useActiveSection(sectionIds: string[]) {
-  const [activeSection, setActiveSection] = useState<string>("");
+  const [activeSection, setActiveSection] = useState<string>(sectionIds[0] || "home");
+  const idsKey = sectionIds.join(",");
 
   useEffect(() => {
+    const ids = idsKey.split(",").filter(Boolean);
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 120;
 
-      for (let i = sectionIds.length - 1; i >= 0; i--) {
-        const section = document.getElementById(sectionIds[i]);
+      for (let i = ids.length - 1; i >= 0; i--) {
+        const section = document.getElementById(ids[i]);
         if (section && section.offsetTop <= scrollPosition) {
-          setActiveSection(sectionIds[i]);
+          setActiveSection(ids[i]);
           break;
         }
       }
@@ -64,23 +66,32 @@ export function useActiveSection(sectionIds: string[]) {
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll(); // initial check
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [sectionIds]);
+  }, [idsKey]);
 
   return activeSection;
 }
 
-// Hook: Preferes reduced motion
+// Hook: Prefers reduced motion via useSyncExternalStore
+function subscribeReducedMotion(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+  const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+}
+
+function getReducedMotionSnapshot() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function getReducedMotionServerSnapshot() {
+  return false;
+}
+
 export function usePrefersReducedMotion() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mql.matches);
-
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
-  }, []);
-
-  return prefersReducedMotion;
+  return useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot
+  );
 }

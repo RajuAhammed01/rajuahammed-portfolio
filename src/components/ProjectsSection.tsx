@@ -22,7 +22,7 @@ export default function ProjectsSection() {
       : projects.filter((p) => p.category === activeFilter);
 
   return (
-    <section id="projects" className="py-24 lg:py-32 bg-white">
+    <section id="projects" className="py-24 lg:py-32 bg-white dark:bg-[#0B0F17] scroll-mt-24 transition-colors duration-250">
       <div className="section-container">
         {/* Header */}
         <div
@@ -42,8 +42,8 @@ export default function ProjectsSection() {
           </p>
         </div>
 
-        {/* Filters */}
-        <div className="mt-10 flex flex-wrap gap-2">
+        {/* Filters with generous spacing from cards */}
+        <div className="mt-10 mb-12 sm:mb-14 flex flex-wrap gap-2.5 sm:gap-3">
           {categories
             .filter((cat) => {
               if (cat.value === "all") return true;
@@ -53,7 +53,7 @@ export default function ProjectsSection() {
               <button
                 key={cat.value}
                 onClick={() => setActiveFilter(cat.value)}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                className={`px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 shadow-xs cursor-pointer ${
                   activeFilter === cat.value
                     ? "bg-[var(--electric-cobalt)] text-white shadow-sm"
                     : "bg-[var(--cool-white)] text-[var(--slate-gray)] border border-[var(--border-gray)] hover:text-[var(--midnight-ink)] hover:border-[var(--electric-cobalt)]"
@@ -64,8 +64,8 @@ export default function ProjectsSection() {
             ))}
         </div>
 
-        {/* Projects Grid */}
-        <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Projects Grid with generous gaps */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {filteredProjects.map((project, i) => (
             <ProjectCard key={project.id} project={project} index={i} />
           ))}
@@ -97,7 +97,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
     <article
       ref={ref as React.RefObject<HTMLElement>}
-      className={`glass-card overflow-hidden flex flex-col animate-fade-in ${
+      className={`glass-card overflow-hidden flex flex-col h-full animate-fade-in ${
         isInView ? "is-visible" : ""
       }`}
       style={{ transitionDelay: `${index * 80}ms` }}
@@ -110,7 +110,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         {/* Category badge */}
         <div className="absolute top-4 left-4">
           <span
-            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full bg-white/90 backdrop-blur-sm border border-[var(--border-gray)]"
+            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border border-[var(--border-gray)] dark:border-white/10"
             style={{ color: cat.color }}
           >
             <span
@@ -132,22 +132,22 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       </div>
 
       {/* Content */}
-      <div className="flex flex-col flex-1 p-6">
-        <h3 className="text-lg font-bold text-[var(--midnight-ink)] mb-2 leading-snug">
+      <div className="flex flex-col flex-1 p-6 sm:p-7">
+        <h3 className="text-lg font-bold text-[var(--midnight-ink)] mb-2.5 leading-snug">
           {project.title}
         </h3>
-        <p className="text-sm text-[var(--slate-gray)] leading-relaxed mb-1">
-          <span className="font-medium text-[var(--midnight-ink)]">Problem: </span>
+        <p className="text-sm text-[var(--slate-gray)] leading-relaxed mb-2">
+          <span className="font-semibold text-[var(--midnight-ink)]">Problem: </span>
           {project.problem}
         </p>
-        <p className="text-sm text-[var(--slate-gray)] leading-relaxed mb-4 line-clamp-3">
+        <p className="text-sm text-[var(--slate-gray)] leading-relaxed mb-4">
           {project.description}
         </p>
 
         {/* Technologies */}
-        <div className="flex flex-wrap gap-1.5 mb-4 mt-auto">
+        <div className="flex flex-wrap gap-2 mb-4 mt-auto">
           {project.technologies.map((tech) => (
-            <span key={tech} className="tech-tag !text-[11px] !px-2.5 !py-0.5">
+            <span key={tech} className="tech-tag !text-[11px] !px-2.5 !py-1">
               {tech}
             </span>
           ))}

@@ -13,6 +13,7 @@ export const personalInfo = {
   github: "https://github.com/RajuAhammed01",
   linkedin: "https://linkedin.com/in/rajuahammed86",
   location: "Dhaka, Bangladesh",
+  profileImage: "/images/profile.jpg",
 };
 
 export const aboutMe = {
@@ -203,11 +204,86 @@ export const researchInterests = [
   },
 ];
 
+export interface Certification {
+  id: string;
+  title: string;
+  issuer: string;
+  status: "Completed" | "In Progress";
+  badgeText: string;
+  description: string;
+  skills: string[];
+}
+
+export const certifications: Certification[] = [
+  {
+    id: "tf-keras",
+    title: "TensorFlow 2.0 and Keras",
+    issuer: "Frontend Masters",
+    status: "Completed",
+    badgeText: "Deep Learning & Neural Networks",
+    description:
+      "Comprehensive training on neural network architectures, custom model building, layer configuration, training loops, and loss optimization using TensorFlow 2.x and Keras.",
+    skills: ["TensorFlow 2.0", "Keras", "Deep Learning", "Neural Networks", "Python"],
+  },
+  {
+    id: "sql-fundamentals",
+    title: "SQL Fundamentals",
+    issuer: "Frontend Masters",
+    status: "Completed",
+    badgeText: "Relational Databases & Queries",
+    description:
+      "Core principles of relational database design, complex multi-table joins, subqueries, grouping aggregations, data extraction, and query optimization for structured data.",
+    skills: ["SQL", "Relational Databases", "Data Querying", "Database Schema", "Data Analysis"],
+  },
+  {
+    id: "intermediate-python",
+    title: "Intermediate Python",
+    issuer: "Frontend Masters",
+    status: "Completed",
+    badgeText: "Advanced Python Paradigms",
+    description:
+      "Advanced Python programming focusing on object-oriented architecture, functional programming paradigms, custom decorators, generators, error handling, and clean code principles.",
+    skills: ["Python", "OOP", "Decorators & Generators", "Data Structures", "Clean Code"],
+  },
+];
+
+export interface TechnicalAchievement {
+  title: string;
+  category: string;
+  description: string;
+  metric: string;
+}
+
+export const technicalAchievements: TechnicalAchievement[] = [
+  {
+    title: "End-to-End ML Pipeline Architecture",
+    category: "Engineering Milestone",
+    description:
+      "Engineered and evaluated 5+ machine learning systems covering regression, classification, and recommendation engines with reproducible evaluation benchmarks.",
+    metric: "5+ Applied Projects",
+  },
+  {
+    title: "Algorithmic & Theoretical Foundation",
+    category: "Academic Rigor",
+    description:
+      "Undergraduate study in Computer Science and Engineering with focused coursework in Algorithms, Data Structures, Discrete Mathematics, and Intelligent Systems.",
+    metric: "ULAB CSE",
+  },
+  {
+    title: "Applied AI & Recommendation Systems",
+    category: "Applied AI",
+    description:
+      "Architected JobSnap, integrating natural language processing for resume parsing with automated candidate matching algorithms.",
+    metric: "NLP & Matching Engine",
+  },
+];
+
 export const navLinks = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
   { label: "Skills", href: "#skills" },
   { label: "Projects", href: "#projects" },
   { label: "Research", href: "#research" },
-  { label: "Contact", href: "#contact" },
+  { label: "Education", href: "#education" },
+  { label: "Certifications", href: "#certifications" },
 ];

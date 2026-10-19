@@ -1,175 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import { personalInfo, aboutMe } from "@/lib/data";
-import { useSmoothScroll, usePrefersReducedMotion } from "@/hooks/useAnimations";
+import { useSmoothScroll } from "@/hooks/useAnimations";
 
-// Neural Network Visualization Component
-function NeuralNetworkViz() {
-  const prefersReducedMotion = usePrefersReducedMotion();
-
-  // Define node positions for a 3-layer network
-  const layers = [
-    // Input layer
-    [
-      { x: 60, y: 80 },
-      { x: 60, y: 160 },
-      { x: 60, y: 240 },
-      { x: 60, y: 320 },
-    ],
-    // Hidden layer 1
-    [
-      { x: 200, y: 60 },
-      { x: 200, y: 140 },
-      { x: 200, y: 220 },
-      { x: 200, y: 300 },
-      { x: 200, y: 380 },
-    ],
-    // Hidden layer 2
-    [
-      { x: 340, y: 100 },
-      { x: 340, y: 190 },
-      { x: 340, y: 280 },
-      { x: 340, y: 370 },
-    ],
-    // Output layer
-    [
-      { x: 480, y: 150 },
-      { x: 480, y: 250 },
-    ],
-  ];
-
-  // Generate connections between adjacent layers
-  const connections: { x1: number; y1: number; x2: number; y2: number; delay: number }[] = [];
-  let connIdx = 0;
-  for (let l = 0; l < layers.length - 1; l++) {
-    for (const from of layers[l]) {
-      for (const to of layers[l + 1]) {
-        connections.push({
-          x1: from.x,
-          y1: from.y,
-          x2: to.x,
-          y2: to.y,
-          delay: connIdx * 0.1,
-        });
-        connIdx++;
-      }
-    }
-  }
-
-  return (
-    <svg
-      viewBox="0 0 540 440"
-      className="w-full h-full"
-      aria-hidden="true"
-      role="presentation"
-    >
-      <defs>
-        <linearGradient id="connectionGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="var(--electric-cobalt)" stopOpacity="0.15" />
-          <stop offset="50%" stopColor="var(--electric-cobalt)" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="var(--refined-teal)" stopOpacity="0.15" />
-        </linearGradient>
-        <radialGradient id="nodeGradCobalt" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="var(--electric-cobalt)" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="var(--electric-cobalt)" stopOpacity="0.5" />
-        </radialGradient>
-        <radialGradient id="nodeGradTeal" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="var(--refined-teal)" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="var(--refined-teal)" stopOpacity="0.5" />
-        </radialGradient>
-        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-
-      {/* Connections */}
-      {connections.map((conn, i) => (
-        <line
-          key={`conn-${i}`}
-          x1={conn.x1}
-          y1={conn.y1}
-          x2={conn.x2}
-          y2={conn.y2}
-          stroke="url(#connectionGrad)"
-          strokeWidth="1"
-          className={!prefersReducedMotion ? "connection-flow" : ""}
-          style={
-            !prefersReducedMotion
-              ? { animationDelay: `${(i * 0.05) % 3}s` }
-              : {}
-          }
-        />
-      ))}
-
-      {/* Nodes */}
-      {layers.map((layer, layerIdx) =>
-        layer.map((node, nodeIdx) => (
-          <g key={`node-${layerIdx}-${nodeIdx}`}>
-            {/* Outer glow */}
-            <circle
-              cx={node.x}
-              cy={node.y}
-              r={layerIdx === 0 || layerIdx === layers.length - 1 ? 10 : 8}
-              fill={layerIdx < 2 ? "var(--electric-cobalt)" : "var(--refined-teal)"}
-              opacity={0.1}
-              className={!prefersReducedMotion ? "node-pulse" : ""}
-              style={
-                !prefersReducedMotion
-                  ? { animationDelay: `${(layerIdx * 0.7 + nodeIdx * 0.3)}s` }
-                  : {}
-              }
-            />
-            {/* Node circle */}
-            <circle
-              cx={node.x}
-              cy={node.y}
-              r={layerIdx === 0 || layerIdx === layers.length - 1 ? 6 : 5}
-              fill={layerIdx < 2 ? "url(#nodeGradCobalt)" : "url(#nodeGradTeal)"}
-              filter="url(#glow)"
-              className={!prefersReducedMotion ? "node-pulse" : ""}
-              style={
-                !prefersReducedMotion
-                  ? { animationDelay: `${(layerIdx * 0.7 + nodeIdx * 0.3)}s` }
-                  : {}
-              }
-            />
-          </g>
-        ))
-      )}
-
-      {/* Layer labels */}
-      <text x="60" y="420" textAnchor="middle" fill="var(--slate-gray)" fontSize="11" fontFamily="var(--font-mono)" opacity="0.7">
-        Input
-      </text>
-      <text x="200" y="420" textAnchor="middle" fill="var(--slate-gray)" fontSize="11" fontFamily="var(--font-mono)" opacity="0.7">
-        Hidden
-      </text>
-      <text x="340" y="420" textAnchor="middle" fill="var(--slate-gray)" fontSize="11" fontFamily="var(--font-mono)" opacity="0.7">
-        Hidden
-      </text>
-      <text x="480" y="420" textAnchor="middle" fill="var(--slate-gray)" fontSize="11" fontFamily="var(--font-mono)" opacity="0.7">
-        Output
-      </text>
-    </svg>
-  );
-}
-
-// Data flow particles
+// Data flow ambient particles
 function DataFlowDots() {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+    <div
+      className="absolute inset-0 overflow-hidden pointer-events-none"
+      aria-hidden="true"
+    >
       {[...Array(6)].map((_, i) => (
         <div
           key={i}
-          className="absolute w-1 h-1 rounded-full bg-[var(--electric-cobalt)] opacity-20 float-gentle"
+          className="absolute w-1.5 h-1.5 rounded-full bg-[var(--electric-cobalt)] opacity-20 float-gentle"
           style={{
-            left: `${15 + i * 15}%`,
-            top: `${20 + (i % 3) * 25}%`,
+            left: `${12 + i * 16}%`,
+            top: `${18 + (i % 3) * 26}%`,
             animationDelay: `${i * 1.2}s`,
             animationDuration: `${5 + i}s`,
           }}
@@ -179,12 +28,35 @@ function DataFlowDots() {
   );
 }
 
+// Simplified subtle neural network background motif (non-competing)
+function SubtleNeuralMotif() {
+  return (
+    <svg
+      viewBox="0 0 300 300"
+      className="absolute -right-10 -bottom-10 w-72 h-72 opacity-[0.07] pointer-events-none"
+      aria-hidden="true"
+    >
+      <line x1="50" y1="50" x2="150" y2="100" stroke="var(--electric-cobalt)" strokeWidth="1.5" />
+      <line x1="50" y1="150" x2="150" y2="100" stroke="var(--electric-cobalt)" strokeWidth="1.5" />
+      <line x1="50" y1="250" x2="150" y2="200" stroke="var(--electric-cobalt)" strokeWidth="1.5" />
+      <line x1="150" y1="100" x2="250" y2="150" stroke="var(--electric-cobalt)" strokeWidth="1.5" />
+      <line x1="150" y1="200" x2="250" y2="150" stroke="var(--electric-cobalt)" strokeWidth="1.5" />
+      <circle cx="50" cy="50" r="8" fill="var(--electric-cobalt)" />
+      <circle cx="50" cy="150" r="8" fill="var(--electric-cobalt)" />
+      <circle cx="50" cy="250" r="8" fill="var(--electric-cobalt)" />
+      <circle cx="150" cy="100" r="10" fill="var(--electric-cobalt)" />
+      <circle cx="150" cy="200" r="10" fill="var(--electric-cobalt)" />
+      <circle cx="250" cy="150" r="12" fill="var(--refined-teal)" />
+    </svg>
+  );
+}
+
 export default function HeroSection() {
   const scrollTo = useSmoothScroll();
   const [isVisible, setIsVisible] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
-    // Trigger entrance animation
     const timer = setTimeout(() => setIsVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
@@ -192,11 +64,14 @@ export default function HeroSection() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center overflow-hidden"
-      style={{ paddingTop: "var(--nav-height)" }}
+      className="relative min-h-[calc(100vh-var(--nav-height))] flex items-center py-16 lg:py-24"
+      style={{ paddingTop: "calc(var(--nav-height) + 2rem)" }}
     >
-      {/* Background pattern */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      {/* Background patterns */}
+      <div
+        className="absolute inset-0 overflow-hidden pointer-events-none"
+        aria-hidden="true"
+      >
         {/* Subtle grid */}
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -208,7 +83,7 @@ export default function HeroSection() {
             backgroundSize: "60px 60px",
           }}
         />
-        {/* Top-right gradient blob */}
+        {/* Gradient ambient blobs */}
         <div
           className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full opacity-30"
           style={{
@@ -216,7 +91,6 @@ export default function HeroSection() {
               "radial-gradient(circle, var(--cobalt-subtle) 0%, transparent 70%)",
           }}
         />
-        {/* Bottom-left gradient blob */}
         <div
           className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
           style={{
@@ -229,10 +103,11 @@ export default function HeroSection() {
       <DataFlowDots />
 
       <div className="section-container w-full relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Content */}
+        {/* Balanced 2-Column Grid: Left Content (7 cols) & Right Profile Photo (5 cols) */}
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+          {/* Left Column: Introduction & CTAs */}
           <div
-            className={`flex flex-col gap-6 transition-all duration-700 ${
+            className={`lg:col-span-7 flex flex-col gap-6 transition-all duration-700 ${
               isVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-8"
@@ -245,24 +120,24 @@ export default function HeroSection() {
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--refined-teal)]"></span>
               </span>
               <span className="text-sm font-medium text-[var(--slate-gray)] font-[var(--font-mono)]">
-                Open to opportunities
+                Open to AI/ML Opportunities & Research
               </span>
             </div>
 
             {/* Heading */}
             <div>
-              <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold text-[var(--midnight-ink)] leading-[1.1] tracking-[-0.03em]">
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold text-[var(--midnight-ink)] leading-[1.15] tracking-[-0.03em]">
                 Hi, I&apos;m{" "}
                 <span className="text-[var(--electric-cobalt)]">
                   {personalInfo.name}
                 </span>
               </h1>
-              <p className="mt-3 text-xl sm:text-2xl font-semibold text-[var(--deep-navy)] opacity-70">
+              <p className="mt-3 text-xl sm:text-2xl font-semibold text-[var(--deep-navy)] opacity-85">
                 {personalInfo.headline}
               </p>
             </div>
 
-            {/* Introduction */}
+            {/* Introduction paragraph */}
             <p className="text-base sm:text-lg text-[var(--slate-gray)] leading-relaxed max-w-xl">
               {personalInfo.introduction}
             </p>
@@ -276,7 +151,7 @@ export default function HeroSection() {
               ))}
             </div>
 
-            {/* CTAs */}
+            {/* CTA Group */}
             <div className="flex flex-wrap gap-3 mt-2">
               <a
                 href="#projects"
@@ -303,6 +178,7 @@ export default function HeroSection() {
                 </svg>
                 View Projects
               </a>
+
               <a
                 href={personalInfo.github}
                 target="_blank"
@@ -319,91 +195,165 @@ export default function HeroSection() {
                 </svg>
                 GitHub
               </a>
+
+              <a
+                href="#contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollTo("contact");
+                }}
+                className="btn-secondary"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+                Contact Me
+              </a>
             </div>
           </div>
 
-          {/* Neural Network Visualization */}
+          {/* Right Column: Dedicated Profile Photo Area */}
           <div
-            className={`relative hidden lg:block transition-all duration-1000 delay-300 ${
+            className={`lg:col-span-5 flex flex-col items-center justify-center transition-all duration-1000 delay-200 ${
               isVisible
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 translate-x-12"
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-8"
             }`}
           >
-            <div className="relative w-full max-w-lg mx-auto">
-              {/* Background card for the viz */}
-              <div className="relative p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-[var(--border-gray)] shadow-[var(--shadow-md)]">
-                {/* Title bar */}
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[var(--border-gray)]">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-400/60" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-400/60" />
-                    <div className="w-3 h-3 rounded-full bg-green-400/60" />
+            <div className="relative w-full max-w-[340px] sm:max-w-[370px] mx-auto">
+              {/* Subtle background neural motif */}
+              <SubtleNeuralMotif />
+
+              {/* Profile Photo Card with Professional 4:5 Aspect Ratio */}
+              <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden border border-[var(--border-gray)] bg-white dark:bg-slate-900 dark:border-white/10 shadow-[var(--shadow-card-hover)] flex flex-col items-center justify-center group transition-all duration-300">
+                {!imgError ? (
+                  // Real Profile Image
+                  <Image
+                    src="/images/profile.jpg"
+                    alt={`${personalInfo.name} — ${personalInfo.headline}`}
+                    fill
+                    sizes="(max-width: 640px) 340px, (max-width: 1024px) 370px, 420px"
+                    priority
+                    className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
+                    onError={() => setImgError(true)}
+                  />
+                ) : (
+                  // Tasteful, Elegant Placeholder matching the existing design system
+                  <div className="w-full h-full p-8 flex flex-col items-center justify-center text-center bg-gradient-to-b from-[var(--ice-blue)]/40 via-[var(--cool-white)] to-white relative">
+                    {/* Portrait Avatar Silhouette Icon */}
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[var(--cobalt-subtle)] border-2 border-dashed border-[var(--electric-cobalt)]/40 flex items-center justify-center mb-5 text-[var(--electric-cobalt)] shadow-sm">
+                      <svg
+                        width="48"
+                        height="48"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                    </div>
+
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-semibold text-[var(--electric-cobalt)] bg-[var(--cobalt-subtle)] rounded-full border border-[var(--electric-cobalt)]/20 mb-3">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--electric-cobalt)]" />
+                      Profile Photo Area
+                    </span>
+
+                    <h4 className="text-base font-bold text-[var(--midnight-ink)] mb-1">
+                      {personalInfo.name}
+                    </h4>
+                    <p className="text-xs text-[var(--slate-gray)] mb-4 font-medium">
+                      {personalInfo.headline}
+                    </p>
+
+                    <div className="p-3 rounded-lg bg-white/80 border border-[var(--border-gray)] text-[11px] text-[var(--slate-gray)] leading-relaxed max-w-[240px]">
+                      Add your portrait file to:
+                      <code className="block mt-1 font-mono text-[10px] text-[var(--deep-navy)] font-semibold bg-[var(--ice-blue)] px-1.5 py-0.5 rounded">
+                        public/images/profile.jpg
+                      </code>
+                    </div>
                   </div>
-                  <span className="ml-2 text-xs font-mono text-[var(--slate-gray)]">
-                    neural_network.py
-                  </span>
-                </div>
-                <NeuralNetworkViz />
+                )}
               </div>
 
-              {/* Floating accent cards */}
+              {/* Floating Supporting Accent Badge 1 (Top-Right) */}
               <div
-                className={`absolute -top-4 -right-4 bg-white rounded-xl border border-[var(--border-gray)] shadow-[var(--shadow-md)] px-4 py-3 ${
+                className={`absolute -top-3 -right-3 sm:-right-4 bg-white/95 backdrop-blur-md rounded-xl border border-[var(--border-gray)] shadow-[var(--shadow-md)] px-3.5 py-2.5 flex items-center gap-2.5 ${
                   isVisible ? "float-gentle" : ""
                 }`}
                 style={{ animationDelay: "0.5s" }}
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-[var(--cobalt-subtle)] flex items-center justify-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--electric-cobalt)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                      <line x1="12" y1="22.08" x2="12" y2="12" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-[var(--midnight-ink)]">ML Models</p>
-                    <p className="text-[10px] text-[var(--slate-gray)]">Classification & Regression</p>
-                  </div>
+                <div className="w-8 h-8 rounded-lg bg-[var(--cobalt-subtle)] flex items-center justify-center flex-shrink-0 text-[var(--electric-cobalt)]">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                    <line x1="12" y1="22.08" x2="12" y2="12" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-[var(--midnight-ink)]">
+                    AI / ML Engineering
+                  </p>
+                  <p className="text-[10px] text-[var(--slate-gray)] font-medium">
+                    Models & Applied Systems
+                  </p>
                 </div>
               </div>
 
+              {/* Floating Supporting Accent Badge 2 (Bottom-Left) */}
               <div
-                className={`absolute -bottom-3 -left-6 bg-white rounded-xl border border-[var(--border-gray)] shadow-[var(--shadow-md)] px-4 py-3 ${
+                className={`absolute -bottom-3 -left-3 sm:-left-4 bg-white/95 backdrop-blur-md rounded-xl border border-[var(--border-gray)] shadow-[var(--shadow-md)] px-3.5 py-2.5 flex items-center gap-2.5 ${
                   isVisible ? "float-gentle" : ""
                 }`}
                 style={{ animationDelay: "1.5s" }}
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-[var(--teal-subtle)] flex items-center justify-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--refined-teal)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="20" x2="18" y2="10" />
-                      <line x1="12" y1="20" x2="12" y2="4" />
-                      <line x1="6" y1="20" x2="6" y2="14" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-[var(--midnight-ink)]">Data Science</p>
-                    <p className="text-[10px] text-[var(--slate-gray)]">Analysis & Visualization</p>
-                  </div>
+                <div className="w-8 h-8 rounded-lg bg-[var(--teal-subtle)] flex items-center justify-center flex-shrink-0 text-[var(--refined-teal)]">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-[var(--midnight-ink)]">
+                    ULAB CSE
+                  </p>
+                  <p className="text-[10px] text-[var(--slate-gray)] font-medium">
+                    Dhaka, Bangladesh
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div
-          className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-all duration-700 delay-1000 ${
-            isVisible ? "opacity-60" : "opacity-0"
-          }`}
-        >
-          <span className="text-xs text-[var(--slate-gray)] font-[var(--font-mono)]">
-            Scroll to explore
-          </span>
-          <div className="w-5 h-8 rounded-full border-2 border-[var(--slate-gray)] flex items-start justify-center p-1">
-            <div className="w-1 h-2 rounded-full bg-[var(--slate-gray)] animate-bounce" />
           </div>
         </div>
       </div>
